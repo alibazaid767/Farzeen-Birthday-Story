@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Farzeen Hameed 💖</title>
+    
+    <!-- Google Fonts: Poppins for clean, modern readability -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #ff9a9e;
+            --secondary: #fecfef;
+            --accent: #d63384;
+            --text: #5d4037;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            font-family: var(--font-main);
+            color: var(--text);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- FLOATING BACKGROUND --- */
+        #floating-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floater {
+            position: absolute;
+            bottom: -50px;
+            animation: floatUp linear forwards;
+            opacity: 0.7;
+            font-size: 24px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+        }
+
+        /* --- PAGE STRUCTURE --- */
+        .book-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+            perspective: 1000px;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(100px) scale(0.9);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0) scale(1);
+        }
+
+        .page.prev {
+            opacity: 0;
+            transform: translateX(-100px) scale(0.9);
+        }
+
+        /* --- CARDS --- */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 30px 25px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #4a4a4a;
+            font-weight: 300;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            background: linear-gradient(45deg, var(--primary), #fad0c4);
+            color: white;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 12px 35px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:active { transform: scale(0.95); }
+
+        .btn-reveal {
+            background: linear-gradient(45deg, #ff512f, #dd2476);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(221, 36, 118, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(221, 36, 118, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(221, 36, 118, 0); }
+        }
+
+        /* --- UI CONTROLS --- */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            cursor: pointer;
+            display: none; /* Hidden until start */
+        }
+
+        .dots-container {
+            position: fixed;
+            bottom: 25px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 50;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+        }
+
+        /* --- OVERLAY --- */
+        #start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        /* --- FINAL SURPRISE --- */
+        #final-message {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--accent);
+        }
+
+        .final-text {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Background -->
+    <div id="floating-container"></div>
+
+    <!-- Music Toggle -->
+    <div class="music-btn" id="music-btn" onclick="toggleAudio()">🎵</div>
+
+    <!-- Start Overlay (Required for Audio Policy) -->
+    <div id="start-overlay" onclick="startExperience()">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🎁</div>
+        <h2 style="margin-bottom: 10px;">For My Peena </h2>
+        <p style="opacity: 0.8;">Tap anywhere to open your story...</p>
+    </div>
+
+    <!-- BOOK CONTENT -->
+    <div class="book-container">
+        
+        <!-- Page 1 -->
+        <div class="page active" id="p1">
+            <div class="card">
+                <h1>Hi Farzeen 💖</h1>
+                <p>“A little storybook for the most amazing person in my life 💖📖. Today isn’t just another day… it’s your special day 🎂🌹, the day the world got brighter, softer and more beautiful because you came into it 🌍✨💕.</p>
+                <button class="btn" onclick="nextPage()">Start Reading</button>
+            </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="page" id="p2">
+            <div class="card">
+                <h1>Sunshine ☀️</h1>
+                <p>Farzeen, your smile lights up my world like the first rays of the morning sun 🌅💫. Every moment with you feels like pure magic ✨💖, and I am so lucky to walk in your light forever 🌍💕</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 3 -->
+        <div class="page" id="p3">
+            <div class="card">
+                <h1>Your Smile 😊</h1>
+                <p>Every time you laugh 😄, every time you smile 😊, my heart skips a beat 💓. Your happiness is my happiness 🌍💕, and I want to protect it forever 🛡️✨.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 4 -->
+        <div class="page" id="p4">
+            <div class="card">
+                <h1>My Blessing 🌸</h1>
+                <p>I never knew life could feel this beautiful until I met you 🌙✨. You are the blessing I never knew I needed 🤍🌹, and I thank the universe every single day for you 🌌💕.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 5 -->
+        <div class="page" id="p5">
+            <div class="card">
+                <h1>My Everything 🧸</h1>
+                <p>You are my heart 💖, my soul 🌙, my safe place 🫶. Every memory with you is a treasure I hold close 💎✨. I can’t imagine life without you by my side forever 🤍🌍.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 6 -->
+        <div class="page" id="p6">
+            <div class="card">
+                <h1>Always & Forever 💍</h1>
+                <p>No matter what life brings, I choose you… always 💍🤍. You are my forever 🌙, my favorite 💖, my home 🏡✨. And I will never stop choosing you 🌍💕.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 7 -->
+        <div class="page" id="p7">
+            <div class="card">
+                <h1>My Wish 💫</h1>
+                <p>On this special day 🎉🎂, I wish you endless joy 😊, laughter 😄, love 💕, and dreams that come true 🌟🌈. May your heart always feel as deeply loved as you make me feel 🤍✨.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 8 -->
+        <div class="page" id="p8">
+            <div class="card">
+                <h1>Happy Birthday! 🎂</h1>
+                <p>Happy Birthday, Farzeen! 🎂🎉💖 You are the most precious part of my life 🌍🤍, and I hope this special day brings you as much happiness, love, and warmth as you bring into my life every single day 🌹✨💕.</p>
+                <button class="btn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+
+        <!-- Page 10 -->
+        <div class="page" id="p9">
+            <div class="card">
+                <h1>One Last Thing… 💌</h1>
+                <p>Before you blow out your candles, I have one very special message just for you… something from my heart that I hope you will always remember.</p>
+                <button class="btn btn-reveal" onclick="nextPage()">Open Message</button>
+            </div>
+        </div>
+
+        <!-- Page 11 -->
+        <div class="page" id="p10">
+            <div class="card">
+                <h1>From My Heart ❤️</h1>
+                <button id="reveal-btn" class="btn btn-reveal" onclick="revealSurprise()">Tap to Reveal</button>
+                
+                <div id="final-message">
+                    <p class="final-text">"Farzeen Hameed, I don’t just love you… I choose you 🤍. Every day 🌅. Forever 💍✨.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Progress Dots -->
+    <div class="dots-container" id="dots"></div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        /* =========================================
+           1. CORE VARIABLES & SETUP
+           ========================================= */
+        let currentPage = 1;
+        const totalPages = 10;
+        let audioCtx = null;
+        let isPlaying = false;
+        let scheduler = null;
+
+        // Initialize Dots
+        const dotsContainer = document.getElementById('dots');
+        for(let i=1; i<=totalPages; i++){
+            let d = document.createElement('div');
+            d.className = i===1 ? 'dot active' : 'dot';
+            d.id = 'dot-'+i;
+            dotsContainer.appendChild(d);
+        }
+
+        /* =========================================
+           2. WEB AUDIO API ENGINE (The Piano)
+           ========================================= */
+        const notes = {
+            'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+            'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99
+        };
+
+        const song = [
+            {n:'G4', d:0.3}, {n:'G4', d:0.3}, {n:'A4', d:0.6}, {n:'G4', d:0.6}, {n:'C5', d:0.6}, {n:'B4', d:1.2},
+            {n:'G4', d:0.3}, {n:'G4', d:0.3}, {n:'A4', d:0.6}, {n:'G4', d:0.6}, {n:'D5', d:0.6}, {n:'C5', d:1.2},
+            {n:'G4', d:0.3}, {n:'G4', d:0.3}, {n:'G5', d:0.6}, {n:'E5', d:0.6}, {n:'C5', d:0.6}, {n:'B4', d:0.6}, {n:'A4', d:0.6},
+            {n:'F5', d:0.3}, {n:'F5', d:0.3}, {n:'E5', d:0.6}, {n:'C5', d:0.6}, {n:'D5', d:0.6}, {n:'C5', d:1.5}
+        ];
+
+        function playNote(freq, dur, time) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            // Triangle wave sounds soft like a music box/piano blend
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(time);
+            
+            // Envelope to mimic piano decay
+            gain.gain.setValueAtTime(0.1, time);
+            gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+            
+            osc.stop(time + dur);
+        }
+
+        function playMelody() {
+            if (!isPlaying) return;
+            
+            let startTime = audioCtx.currentTime + 0.1;
+            let cursor = 0;
+
+            song.forEach(note => {
+                playNote(notes[note.n], note.d, startTime + cursor);
+                cursor += note.d;
+            });
+
+            // Loop logic
+            scheduler = setTimeout(playMelody, (cursor * 1000) + 500);
+        }
+
+        function toggleAudio() {
+            const btn = document.getElementById('music-btn');
+            if (isPlaying) {
+                isPlaying = false;
+                clearTimeout(scheduler);
+                btn.innerText = '🔇';
+                btn.style.opacity = "0.7";
+            } else {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                isPlaying = true;
+                playMelody();
+                btn.innerText = '🎵';
+                btn.style.opacity = "1";
+            }
+        }
+
+        /* =========================================
+           3. INTERACTION & NAVIGATION
+           ========================================= */
+        function startExperience() {
+            const overlay = document.getElementById('start-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+
+            // Init Audio Context on first gesture
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            
+            document.getElementById('music-btn').style.display = 'flex';
+            toggleAudio(); // Auto start music
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) changePage(currentPage + 1);
+        }
+
+        function changePage(newPage) {
+            const currentEl = document.getElementById('p' + currentPage);
+            const nextEl = document.getElementById('p' + newPage);
+            
+            if (newPage > currentPage) {
+                currentEl.classList.remove('active');
+                currentEl.classList.add('prev');
+                nextEl.classList.add('active');
+            } else {
+                currentEl.classList.remove('active');
+                nextEl.classList.remove('prev');
+                nextEl.classList.add('active');
+            }
+
+            // Update Dots
+            document.getElementById('dot-'+currentPage).classList.remove('active');
+            document.getElementById('dot-'+newPage).classList.add('active');
+            currentPage = newPage;
+        }
+
+        /* =========================================
+           4. SWIPE LOGIC
+           ========================================= */
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50 && currentPage < totalPages) nextPage();
+            if (touchEndX > touchStartX + 50 && currentPage > 1) changePage(currentPage - 1);
+        }
+
+        /* =========================================
+           5. ANIMATIONS & SURPRISE
+           ========================================= */
+        // Floating Elements
+        const floaterContainer = document.getElementById('floating-container');
+        const icons = ['💖', '🎈', '✨', '🧸', '🌸', '💍', '🦋'];
+        
+        setInterval(() => {
+            const el = document.createElement('div');
+            el.className = 'floater';
+            el.innerText = icons[Math.floor(Math.random() * icons.length)];
+            el.style.left = Math.random() * 90 + 5 + '%';
+            el.style.animationDuration = (Math.random() * 5 + 6) + 's';
+            floaterContainer.appendChild(el);
+            setTimeout(() => el.remove(), 11000);
+        }, 800);
+
+        // Reveal & Confetti
+        function revealSurprise() {
+            document.getElementById('reveal-btn').style.display = 'none';
+            document.getElementById('final-message').style.display = 'block';
+            fireConfetti();
+        }
+
+        function fireConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = Array.from({length: 150}).map(() => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                c: ['#ff9a9e', '#a18cd1', '#fecfef', '#d63384'][Math.floor(Math.random()*4)],
+                s: Math.random() * 5 + 3,
+                d: Math.random() * 3 + 1,
+                a: Math.random() * 2 * Math.PI
+            }));
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.d;
+                    p.x += Math.sin(p.a) * 2;
+                    p.a += 0.1;
+                    ctx.fillStyle = p.c;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+    </script>
+</body>
+</html>
